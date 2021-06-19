@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Docker GUI</title>
     <link rel="stylesheet" href="home.css">
 </head>
 
@@ -18,35 +18,42 @@
             </p>
         </div>
 
+        <!--Cards-->
         <div class="card-container">
-            <div class="card card-1">
+            <div class="card cards">
                 <h2 class="card__title">Run Docker Container</h2>
-                <input class="input2" type="text" placeholder="Container name" />
+                <input id="image_name1" class="input1" type="text" placeholder="Image name" />
                 <p class="card__apply"><button id="myBtn1" class="myBtn">Run</button></p>
             </div>
 
-            <div class="card card-2">
-                <h2 class="card__title">Execute Command in Docker Container</h2>
-                <input class="input1" type="text" placeholder="Command" />
-                <input class="input2" type="text" placeholder="Container name" />
+            <div class="card cards">
+                <h2 class="card__title">Download Docker Image</h2>
+                <input id="image_name2" class="input1" type="text" placeholder="Image Name" />
                 <p class="card__apply"><button id="myBtn2" class="myBtn">Run</button></p>
             </div>
 
-            <div class="card card-3">
-                <h2 class="card__title">List Docker Containers</h2>
+            <div class="card cards">
+                <h2 class="card__title">List Docker Images</h2>
                 <p class="card__apply"><button id="myBtn3" class="myBtn">Run</button></p>
             </div>
 
-            <div class="card card-4">
+            <div class="card cards">
                 <h2 class="card__title">Remove Docker Image</h2>
-                <input class="input2" type="text" placeholder="Name of Image" />
+                <input id="image_name3" class="input1" type="text" placeholder="Image Name" />
                 <p class="card__apply"><button id="myBtn4" class="myBtn">Run</button></p>
             </div>
 
-            <div class="card card-5">
-                <h2 class="card__title">Download Docker Image</h2>
-                <input class="input2" type="text" placeholder="Image name" />
+            <div class="card cards">
+                <h2 class="card__title">Execute Command</h2>
+                <input id="container_name" class="input1" type="text" placeholder="Container name" />
+                <input id="command_name" class="input2" type="text" placeholder="Command name" />
                 <p class="card__apply"><button id="myBtn5" class="myBtn">Run</button>
+                </p>
+            </div>
+
+            <div class="card cards">
+                <h2 class="card__title">List Docker Containers</h2>
+                <p class="card__apply"><button id="myBtn6" class="myBtn">Run</button>
                 </p>
             </div>
         </div>
@@ -56,16 +63,13 @@
 
     <!-- The Modal -->
     <div id="myModal" class="modal">
-
-        <!-- Modal content -->
         <div class="modal-content">
             <div class="modal-header">
                 <span class="close">&times;</span>
                 <h2>Output:-</h2>
             </div>
             <p id="text" class="modal-body">
-                Some text in the Modal Body
-                Some other text...
+                Please wait...
             </p>
         </div>
 
@@ -75,12 +79,13 @@
         // Get the modal
         var modal = document.getElementById("myModal");
 
-        // Get the button that opens the modal
+        // Get the buttons that opens the modal
         var btn1 = document.getElementById("myBtn1");
         var btn2 = document.getElementById("myBtn2");
         var btn3 = document.getElementById("myBtn3");
         var btn4 = document.getElementById("myBtn4");
         var btn5 = document.getElementById("myBtn5");
+        var btn6 = document.getElementById("myBtn6");
 
         // Get the <span> element that closes the modal
         var span = document.getElementsByClassName("close")[0];
@@ -89,7 +94,18 @@
         btn1.onclick = function () {
             modal.style.display = "block";
             var objXHR = new XMLHttpRequest();
-            objXHR.open("GET", "http://192.168.1.10/cgi-bin/local.py?x=" + document.getElementById('input').value, "true");
+            objXHR.open("GET", "http://192.168.29.219/cgi-bin/python.py?x=run&y=" + document.getElementById('image_name1').value, "true");
+            objXHR.send();
+
+            objXHR.onload = function () {
+                document.getElementById("text").innerHTML = objXHR.responseText + "Container Launched";
+            }
+        }
+
+        btn2.onclick = function () {
+            modal.style.display = "block";
+            var objXHR = new XMLHttpRequest();
+            objXHR.open("GET", "http://192.168.29.219/cgi-bin/python.py?x=download&y=" + document.getElementById('image_name2').value, "true");
             objXHR.send();
 
             objXHR.onload = function () {
@@ -97,24 +113,49 @@
             }
         }
 
-        btn2.onclick = function () {
-            modal.style.display = "block";
-            document.getElementById("text").innerHTML = "hello";
-        }
-
         btn3.onclick = function () {
             modal.style.display = "block";
-            document.getElementById("text").innerHTML = "hello";
+
+            var objXHR = new XMLHttpRequest();
+            objXHR.open("GET", "http://192.168.29.219/cgi-bin/python.py?x=images", "true");
+            objXHR.send();
+
+            objXHR.onload = function () {
+                document.getElementById("text").innerHTML = objXHR.responseText;
+            }
         }
 
         btn4.onclick = function () {
             modal.style.display = "block";
-            document.getElementById("text").innerHTML = "hello";
+            var objXHR = new XMLHttpRequest();
+            objXHR.open("GET", "http://192.168.29.219/cgi-bin/python.py?x=rmi&y=" + document.getElementById('image_name3').value, "true");
+            objXHR.send();
+
+            objXHR.onload = function () {
+                document.getElementById("text").innerHTML = objXHR.responseText + "Image Removed";
+            }
         }
 
         btn5.onclick = function () {
             modal.style.display = "block";
-            document.getElementById("text").innerHTML = "hello";
+            var objXHR = new XMLHttpRequest();
+            objXHR.open("GET", "http://192.168.29.219/cgi-bin/python.py?x=exec&y=" + document.getElementById('container_name').value+"&z="+ document.getElementById('command_name').value, "true");
+            objXHR.send();
+
+            objXHR.onload = function () {
+                document.getElementById("text").innerHTML = objXHR.responseText;
+            }
+        }
+
+        btn6.onclick = function () {
+            modal.style.display = "block";
+            var objXHR = new XMLHttpRequest();
+            objXHR.open("GET", "http://192.168.29.219/cgi-bin/python.py?x=list", "true");
+            objXHR.send();
+
+            objXHR.onload = function () {
+                document.getElementById("text").innerHTML = objXHR.responseText;
+            }
         }
 
 
